@@ -1,0 +1,19 @@
+{
+  "name": "webpage-screenshot-processor-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "deploy": "serverless deploy --stage prod"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chrome-aws-lambda": "^5.5.0",
+    "serverless-domain-manager": "^5.1.0",
+    "serverless-offline": "^6.8.0"
+  },
+  "dependencies": {
+    "uuid": "^8.3.2"
+  }
+}

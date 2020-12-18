@@ -1,0 +1,66 @@
+service: webpage-screenshot-processor
+
+plugins:
+  - serverless-offline
+  - serverless-domain-manager
+
+custom:
+  s3Bucket: ${self:service.name}-images-${opt:stage}
+  width: 1200
+  height: 800
+  customDomain:
+    domainName: apipagemelt-${opt:stage}.alexandermorton.co.uk
+    stage: ${opt:stage}
+    certificateName: 'alexandermorton.co.uk'
+    createRoute53Record: true
+    endpointType: 'edge'
+    apiType: rest
+    autoDomain: true
+    securityPolicy: tls_1_2
+
+provider:
+  name: aws
+  region: eu-west-2
+  versionFunctions: false
+  layers:
+    # https://github.com/shelfio/chrome-aws-lambda-layer
+    - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:20
+  # function parameters
+  runtime: nodejs12.x
+  memorySize: 512
+  timeout: 30
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+      Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+functions:
+  screenshot:
+    events:
+      - http:
+          path: /
+          method: get
+          request:
+            parameters:
+              querystrings:
+                url: true
+    handler: handler.screenshot
+    reservedConcurrency: 10 
+    environment:
+      S3_REGION: ${self:provider.region}
+      S3_BUCKET: ${self:custom.s3Bucket}
+      WIDTH: ${self:custom.width}
+      HEIGHT: ${self:custom.height}
+
+resources:
+  Resources:
+    screenshotsBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Delete
+      Properties:
+        BucketName: ${self:custom.s3Bucket}
+        AccessControl: Private
