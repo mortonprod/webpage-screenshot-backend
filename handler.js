@@ -10,14 +10,20 @@ exports.screenshot = async (event, context, callback) => {
       statusCode: 400
     };
   }
+  if (!event.headers || !event.headers["User-Agent"]) {
+    return {
+      statusCode: 400
+    };
+  }
   const url = event.queryStringParameters["url"];
+  const userAgent = event.headers["User-Agent"];
   console.log(JSON.stringify(event));
   const id = uuidv4();
   try {
     const vw = Number(event.queryStringParameters["vw"]) || Number(process.env.WIDTH);
     let vh = Number(event.queryStringParameters["vh"]) || Number(process.env.HEIGHT);
     vh = Number(vh) + Number(process.env.SCROLL_HEIGHT);
-    const buffer = await getBuffer(url,vw,vh);
+    const buffer = await getBuffer(url,vw,vh,userAgent);
     let Key = getBucketName(url,id,vw,vh);
     const result = await s3.upload({
         Bucket: process.env.S3_BUCKET,
@@ -63,7 +69,7 @@ function getBucketName(url, id, width, height) {
   return `${url}___${width}___${height}___${id}.jpg`;
 }
 
-async function getBuffer(url,width, height) {
+async function getBuffer(url,width, height,userAgent) {
   try {
     const browser = await chromeLambda.puppeteer.launch({
       args: chromeLambda.args,
@@ -74,6 +80,7 @@ async function getBuffer(url,width, height) {
       } 
     });
     const page = await browser.newPage();
+    await page.setUserAgent(userAgent);
     await page.goto(url);
     const buffer = await page.screenshot({quality: 30, type: "jpeg"})
     return buffer;
