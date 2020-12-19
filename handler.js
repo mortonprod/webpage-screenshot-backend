@@ -42,6 +42,7 @@ exports.screenshot = async (event, context, callback) => {
       })
     };
   } catch (e) {
+    console.error(JSON.stringify(e));
     return {
       statusCode: 400,
       headers: {
@@ -63,16 +64,21 @@ function getBucketName(url, id, width, height) {
 }
 
 async function getBuffer(url,width, height) {
-  const browser = await chromeLambda.puppeteer.launch({
-    args: chromeLambda.args,
-    executablePath: await chromeLambda.executablePath,
-    defaultViewport: {
-      width: Number(width),
-      height: Number(height)
-    } 
-  });
-  const page = await browser.newPage();
-  await page.goto(url);
-  const buffer = await page.screenshot({quality: 50, type: jpeg})
-  return buffer;
+  try {
+    const browser = await chromeLambda.puppeteer.launch({
+      args: chromeLambda.args,
+      executablePath: await chromeLambda.executablePath,
+      defaultViewport: {
+        width: Number(width),
+        height: Number(height)
+      } 
+    });
+    const page = await browser.newPage();
+    await page.goto(url);
+    const buffer = await page.screenshot({quality: 30, type: "jpeg"})
+    return buffer;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 }
