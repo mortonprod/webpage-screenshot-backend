@@ -63,4 +63,14 @@ resources:
       DeletionPolicy: Delete
       Properties:
         BucketName: ${self:custom.s3Bucket}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - 'https://pagemelt.alexandermorton.co.uk'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+              MaxAge: 3000
         AccessControl: Private

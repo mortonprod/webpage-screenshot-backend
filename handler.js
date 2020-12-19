@@ -13,26 +13,38 @@ exports.screenshot = async (event, context, callback) => {
   const url = event.queryStringParameters["url"];
   console.log(JSON.stringify(event));
   const id = uuidv4();
-  const buffer = await getBuffer(url,process.env.WIDTH,process.env.HEIGHT);
-  let Key = getBucketName(url,id,process.env.WIDTH,process.env.HEIGHT);
-  const result = await s3.upload({
-      Bucket: process.env.S3_BUCKET,
-      Key,
-      Body: buffer,
-      ContentType: "image/png"
-    }).promise();
-  const signedUrl = s3.getSignedUrl('getObject', {
-      Bucket: process.env.S3_BUCKET,
-      Key,
-      Expires: 1000
-  });
+  try {
+    const buffer = await getBuffer(url,process.env.WIDTH,process.env.HEIGHT);
+    let Key = getBucketName(url,id,process.env.WIDTH,process.env.HEIGHT);
+    const result = await s3.upload({
+        Bucket: process.env.S3_BUCKET,
+        Key,
+        Body: buffer,
+        ContentType: "image/png"
+      }).promise();
+    const signedUrl = s3.getSignedUrl('getObject', {
+        Bucket: process.env.S3_BUCKET,
+        Key,
+        Expires: 1000
+    });
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-        url: signedUrl
-    })
-  };
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': 'https://pagemelt.alexandermorton.co.uk'
+      },
+      body: JSON.stringify({
+          url: signedUrl
+      })
+    };
+  } catch (e) {
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': 'https://pagemelt.alexandermorton.co.uk'
+      }
+    };
+  }
 };
 
 function getBucketName(url, id, width, height) {
