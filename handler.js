@@ -30,12 +30,12 @@ exports.screenshot = async (event, context, callback) => {
         Key,
         Body: buffer,
         ContentType: "image/jpg",
-        cacheControl: 'max-age=86400'
+        CacheControl: 'max-age=86400'
       }).promise();
     const signedUrl = s3.getSignedUrl('getObject', {
         Bucket: process.env.S3_BUCKET,
         Key,
-        Expires: 1000
+        Expires: 30
     });
 
     return {
