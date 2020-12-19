@@ -52,7 +52,7 @@ functions:
                 vw: true
                 vh: true
     handler: handler.screenshot
-    reservedConcurrency: 1
+    reservedConcurrency: 10
     environment:
       S3_REGION: ${self:provider.region}
       S3_BUCKET: ${self:custom.s3Bucket}
