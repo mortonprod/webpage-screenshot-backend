@@ -8,6 +8,7 @@ custom:
   s3Bucket: ${self:service.name}-images-${opt:stage}
   width: 1200
   height: 800
+  scroll_height: 0
   customDomain:
     domainName: apipagemelt-${opt:stage}.alexandermorton.co.uk
     stage: ${opt:stage}
@@ -48,13 +49,16 @@ functions:
             parameters:
               querystrings:
                 url: true
+                vw: true
+                vh: true
     handler: handler.screenshot
-    reservedConcurrency: 10 
+    reservedConcurrency: 1
     environment:
       S3_REGION: ${self:provider.region}
       S3_BUCKET: ${self:custom.s3Bucket}
       WIDTH: ${self:custom.width}
       HEIGHT: ${self:custom.height}
+      SCROLL_HEIGHT: ${self:custom.scroll_height}
 
 resources:
   Resources:
@@ -69,7 +73,9 @@ resources:
               AllowedOrigins:
                 - 'https://pagemelt.alexandermorton.co.uk'
               AllowedHeaders:
-                - '*'
+                - 'Authorization'
+                - 'x-requested-with'
+                - 'origin'
               AllowedMethods:
                 - GET
               MaxAge: 3000

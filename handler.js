@@ -14,13 +14,16 @@ exports.screenshot = async (event, context, callback) => {
   console.log(JSON.stringify(event));
   const id = uuidv4();
   try {
-    const buffer = await getBuffer(url,process.env.WIDTH,process.env.HEIGHT);
-    let Key = getBucketName(url,id,process.env.WIDTH,process.env.HEIGHT);
+    const vw = event.queryStringParameters["vw"] || process.env.WIDTH;
+    let vh = event.queryStringParameters["vh"] || process.env.HEIGHT;
+    let vh = vh + Number(process.env.SCROLL_HEIGHT);
+    const buffer = await getBuffer(url,vw,vh);
+    let Key = getBucketName(url,id,vw,vh);
     const result = await s3.upload({
         Bucket: process.env.S3_BUCKET,
         Key,
         Body: buffer,
-        ContentType: "image/png"
+        ContentType: "image/jpg"
       }).promise();
     const signedUrl = s3.getSignedUrl('getObject', {
         Bucket: process.env.S3_BUCKET,
@@ -55,7 +58,7 @@ function getBucketName(url, id, width, height) {
   // Replace / with __
   url = url.replace(/[\/]/g,'__');
   /// Split width height and id using ____
-  return `${url}___${width}___${height}___${id}.png`;
+  return `${url}___${width}___${height}___${id}.jpg`;
 }
 
 async function getBuffer(url,width, height) {
