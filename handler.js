@@ -16,7 +16,7 @@ exports.screenshot = async (event, context, callback) => {
   try {
     const vw = event.queryStringParameters["vw"] || process.env.WIDTH;
     let vh = event.queryStringParameters["vh"] || process.env.HEIGHT;
-    let vh = vh + Number(process.env.SCROLL_HEIGHT);
+    vh = vh + Number(process.env.SCROLL_HEIGHT);
     const buffer = await getBuffer(url,vw,vh);
     let Key = getBucketName(url,id,vw,vh);
     const result = await s3.upload({
