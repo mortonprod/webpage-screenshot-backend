@@ -5,6 +5,7 @@ const s3 = new S3Client({ region: process.env.S3_REGION });
 const {v4 : uuidv4} = require('uuid')
 
 exports.screenshot = async (event, context, callback) => {
+  console.log(JSON.stringify(event));
   if (!event.queryStringParameters || !event.queryStringParameters["url"]) {
     return {
       statusCode: 400
@@ -16,14 +17,13 @@ exports.screenshot = async (event, context, callback) => {
     };
   }
   // Must check CORS here otherwise the server will still run even if not from the correct origin.
-  if (!event.headers || !event.headers["origin"] || !event.headers["origin"].test("https://pagemelt.alexandermorton.co.uk")) {
+  if (!event.headers || !event.headers["origin"] || !String(event.headers["origin"]).test("https://pagemelt.alexandermorton.co.uk")) {
     return {
       statusCode: 401
     };
   }
   const url = event.queryStringParameters["url"];
   const userAgent = event.headers["User-Agent"];
-  console.log(JSON.stringify(event));
   const id = uuidv4();
   try {
     const vw = Number(event.queryStringParameters["vw"]) || Number(process.env.WIDTH);
