@@ -16,13 +16,18 @@ exports.screenshot = async (event, context, callback) => {
       statusCode: 400
     };
   }
+  if (!event.headers || !event.headers["origin"]) {
+    return {
+      statusCode: 400
+    };
+  }
   // Must check CORS here otherwise the server will still run even if not from the correct origin.
-  if (!event.headers || !event.headers["origin"] || !String(event.headers["origin"]).test("https://pagemelt.alexandermorton.co.uk")) {
+  if (!event.headers["origin"].includes("https://pagemelt.alexandermorton.co.uk")) {
     return {
       statusCode: 401
     };
   }
-  const url = event.queryStringParameters["url"];
+  const url = decodeURIComponent(event.queryStringParameters["url"]);
   const userAgent = event.headers["User-Agent"];
   const id = uuidv4();
   try {
