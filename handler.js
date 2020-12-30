@@ -15,6 +15,12 @@ exports.screenshot = async (event, context, callback) => {
       statusCode: 400
     };
   }
+  // Must check CORS here otherwise the server will still run even if not from the correct origin.
+  if (!event.headers || !event.headers["origin"] || !event.headers["origin"].test("https://pagemelt.alexandermorton.co.uk")) {
+    return {
+      statusCode: 401
+    };
+  }
   const url = event.queryStringParameters["url"];
   const userAgent = event.headers["User-Agent"];
   console.log(JSON.stringify(event));
@@ -50,7 +56,7 @@ exports.screenshot = async (event, context, callback) => {
   } catch (e) {
     console.error(JSON.stringify(e));
     return {
-      statusCode: 400,
+      statusCode: 500,
       headers: {
         'Access-Control-Allow-Origin': 'https://pagemelt.alexandermorton.co.uk'
       }
