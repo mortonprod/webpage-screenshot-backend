@@ -21,6 +21,14 @@ custom:
 
 provider:
   name: aws
+  usagePlan:
+    quota:
+      limit: 10000
+      offset: 0
+      period: MONTH
+    throttle:
+      burstLimit: 10
+      rateLimit: 10
   region: eu-west-2
   versionFunctions: false
   layers:
