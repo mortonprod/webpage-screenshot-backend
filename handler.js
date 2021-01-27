@@ -31,6 +31,7 @@ exports.screenshot = async (event, context, callback) => {
   const userAgent = event.headers["User-Agent"];
   const id = uuidv4();
   try {
+    console.log(`IP: ${event.requestContext.identity.sourceIp}, URL: ${event.queryStringParameters["url"]}`);
     const vw = Number(event.queryStringParameters["vw"]) || Number(process.env.WIDTH);
     let vh = Number(event.queryStringParameters["vh"]) || Number(process.env.HEIGHT);
     vh = Number(vh) + Number(process.env.SCROLL_HEIGHT);
