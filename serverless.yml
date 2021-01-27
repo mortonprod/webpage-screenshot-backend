@@ -62,6 +62,8 @@ functions:
                 url: true
                 vw: true
                 vh: true
+              headers: 
+                Origin: true
     handler: handler.screenshot
     reservedConcurrency: 10
     environment:
