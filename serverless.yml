@@ -3,6 +3,8 @@ service: webpage-screenshot-processor
 plugins:
   - serverless-offline
   - serverless-domain-manager
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 custom:
   s3Bucket: ${self:service.name}-images-${opt:stage}
