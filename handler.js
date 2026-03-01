@@ -1,4 +1,4 @@
-const chromium = require("@sparticuz/chromium-min");
+const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-core");
 const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");

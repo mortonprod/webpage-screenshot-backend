@@ -34,9 +34,6 @@ provider:
         burstLimit: 10
         rateLimit: 10
   versionFunctions: false
-  layers:
-    # https://github.com/Sparticuz/chromium
-    - arn:aws:lambda:${self:provider.region}:764866452798:layer:chromium:131
   runtime: nodejs20.x
   memorySize: 512
   timeout: 30
