@@ -53,8 +53,7 @@ jobs:
           aws cloudformation get-template \
             --stack-name "$STACK_NAME" \
             --region "$REGION" \
-            --query 'TemplateBody' \
-            --output text > /tmp/current-template.json
+            --output json | jq '.TemplateBody' > /tmp/current-template.json
 
           # Splice in only the bucket resource so the import template matches the live stack
           # exactly, with the one addition CloudFormation needs to adopt.
