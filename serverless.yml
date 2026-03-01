@@ -7,9 +7,6 @@ plugins:
   - serverless-aws-documentation
 
 custom:
-  apiGatewayThrottling:
-    maxRequestsPerSecond: 10
-    maxConcurrentRequests: 10
   s3Bucket: ${self:service}-images-${opt:stage}
   width: 1200
   height: 800
@@ -26,15 +23,16 @@ custom:
 
 provider:
   name: aws
-  usagePlan:
-    quota:
-      limit: 10000
-      offset: 0
-      period: MONTH
-    throttle:
-      burstLimit: 10
-      rateLimit: 10
   region: eu-west-2
+  apiGateway:
+    usagePlan:
+      quota:
+        limit: 10000
+        offset: 0
+        period: MONTH
+      throttle:
+        burstLimit: 10
+        rateLimit: 10
   versionFunctions: false
   layers:
     # https://github.com/Sparticuz/chromium
