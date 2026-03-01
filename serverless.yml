@@ -10,7 +10,7 @@ custom:
   apiGatewayThrottling:
     maxRequestsPerSecond: 10
     maxConcurrentRequests: 10
-  s3Bucket: ${self:service.name}-images-${opt:stage}
+  s3Bucket: ${self:service}-images-${opt:stage}
   width: 1200
   height: 800
   scroll_height: 200
@@ -37,21 +37,23 @@ provider:
   region: eu-west-2
   versionFunctions: false
   layers:
-    # https://github.com/shelfio/chrome-aws-lambda-layer
-    - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:20
-  # function parameters
-  runtime: nodejs12.x
+    # https://github.com/Sparticuz/chromium
+    - arn:aws:lambda:${self:provider.region}:764866452798:layer:chromium:131
+  runtime: nodejs20.x
   memorySize: 512
   timeout: 30
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-      Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
-    - Effect: Allow
-      Action:
-        - s3:GetObject
-      Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+          Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+          Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+
 functions:
   screenshot:
     events:
@@ -65,7 +67,7 @@ functions:
                 url: true
                 vw: true
                 vh: true
-              headers: 
+              headers:
                 Origin: true
     handler: handler.screenshot
     reservedConcurrency: 10
@@ -85,8 +87,7 @@ resources:
         BucketName: ${self:custom.s3Bucket}
         CorsConfiguration:
           CorsRules:
-            -
-              AllowedOrigins:
+            - AllowedOrigins:
                 - 'https://pagemelt.alexandermorton.co.uk'
               AllowedHeaders:
                 - 'Authorization'
@@ -95,12 +96,16 @@ resources:
               AllowedMethods:
                 - GET
               MaxAge: 3000
-        AccessControl: Private
-    screenshotValidator:  
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+    screenshotValidator:
       Type: "AWS::ApiGateway::RequestValidator"
       Properties:
         Name: 'screenshot-validator'
-        RestApiId: 
+        RestApiId:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: false
         ValidateRequestParameters: true
@@ -110,6 +115,6 @@ resources:
         RestApiId:
           Ref: 'ApiGatewayRestApi'
         ResponseType: DEFAULT_4XX
-        StatusCode : "400"
+        StatusCode: "400"
         ResponseTemplates:
           application/json: "{\n\"message\": \" Missing information \",\n \"statusCode\": \"'400'\"\n}"
