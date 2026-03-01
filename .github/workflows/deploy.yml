@@ -45,14 +45,31 @@ jobs:
           fi
 
           echo "Bucket exists outside stack — importing..."
-          npx serverless package --stage prod
+
+          # Fetch the CURRENT deployed template (not the freshly packaged one).
+          # Using the packaged Serverless template would include a new ApiGatewayDeployment
+          # logical ID that doesn't exist in the live stack, causing CloudFormation to reject
+          # the IMPORT change set with "missing from ResourceToImport list".
+          aws cloudformation get-template \
+            --stack-name "$STACK_NAME" \
+            --region "$REGION" \
+            --query 'TemplateBody' \
+            --output text > /tmp/current-template.json
+
+          # Splice in only the bucket resource so the import template matches the live stack
+          # exactly, with the one addition CloudFormation needs to adopt.
+          jq '.Resources.screenshotsBucket = {
+            "Type": "AWS::S3::Bucket",
+            "DeletionPolicy": "Retain",
+            "Properties": { "BucketName": "webpage-screenshot-processor-images-prod" }
+          }' /tmp/current-template.json > /tmp/import-template.json
 
           aws cloudformation create-change-set \
             --stack-name "$STACK_NAME" \
             --change-set-name "$CHANGE_SET_NAME" \
             --change-set-type IMPORT \
             --resources-to-import '[{"ResourceType":"AWS::S3::Bucket","LogicalResourceId":"screenshotsBucket","ResourceIdentifier":{"BucketName":"webpage-screenshot-processor-images-prod"}}]' \
-            --template-body file://.serverless/cloudformation-template-update-stack.json \
+            --template-body file:///tmp/import-template.json \
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
             --region "$REGION"
 
