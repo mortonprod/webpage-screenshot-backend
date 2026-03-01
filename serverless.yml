@@ -85,28 +85,27 @@ functions:
 
 resources:
   Resources:
-    # screenshotsBucket: temporarily removed for initial deploy — import via Phase 2
-    # screenshotsBucket:
-    #   Type: AWS::S3::Bucket
-    #   DeletionPolicy: Retain
-    #   Properties:
-    #     BucketName: ${self:custom.s3Bucket}
-    #     CorsConfiguration:
-    #       CorsRules:
-    #         - AllowedOrigins:
-    #             - 'https://pagemelt.alexandermorton.co.uk'
-    #           AllowedHeaders:
-    #             - 'Authorization'
-    #             - 'x-requested-with'
-    #             - 'origin'
-    #           AllowedMethods:
-    #             - GET
-    #           MaxAge: 3000
-    #     PublicAccessBlockConfiguration:
-    #       BlockPublicAcls: true
-    #       BlockPublicPolicy: true
-    #       IgnorePublicAcls: true
-    #       RestrictPublicBuckets: true
+    screenshotsBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: ${self:custom.s3Bucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - 'https://pagemelt.alexandermorton.co.uk'
+              AllowedHeaders:
+                - 'Authorization'
+                - 'x-requested-with'
+                - 'origin'
+              AllowedMethods:
+                - GET
+              MaxAge: 3000
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
     screenshotValidator:
       Type: "AWS::ApiGateway::RequestValidator"
       Properties:
