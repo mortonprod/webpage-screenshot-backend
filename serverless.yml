@@ -60,6 +60,16 @@ functions:
       - http:
           path: /
           method: get
+          cors:
+            origin: 'https://pagemelt.alexandermorton.co.uk'
+            headers:
+              - Content-Type
+              - Origin
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+            allowCredentials: false
           reqValidatorName: 'screenshotValidator'
           request:
             parameters:
@@ -116,5 +126,17 @@ resources:
           Ref: 'ApiGatewayRestApi'
         ResponseType: DEFAULT_4XX
         StatusCode: "400"
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'https://pagemelt.alexandermorton.co.uk'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Origin,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         ResponseTemplates:
           application/json: "{\n\"message\": \" Missing information \",\n \"statusCode\": \"'400'\"\n}"
+    screenshotResponseDefault500:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        ResponseType: DEFAULT_5XX
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'https://pagemelt.alexandermorton.co.uk'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Origin,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
